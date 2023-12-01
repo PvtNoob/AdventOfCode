@@ -13,7 +13,7 @@ namespace Day01 {
             for (int i = 0; i < line.Length; i++) {
                 if (line[i].IsNumeric(out _)) {
                     SaveNumber(line[i]);
-                } else if (checkDigitWords && StartsADigitWord(i, out char? digit)) {
+                } else if (checkDigitWords && StartsADigitWord(i, out char? digit) && digit.HasValue) {
                     SaveNumber(digit.Value);
                 }
             }
