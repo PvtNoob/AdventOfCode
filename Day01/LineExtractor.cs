@@ -1,6 +1,6 @@
 ﻿using Shared;
 
-namespace Day1 {
+namespace Day01 {
     internal class LineExtractor(List<(string word, char digit)> digitWords, string line) {
         private List<(string word, char digit)> digitWords = digitWords;
         private string line = line;

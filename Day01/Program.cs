@@ -1,10 +1,7 @@
-﻿using Day01.Properties;
-
-namespace Day1 {
+﻿namespace Day01 {
     internal class Program {
 
         static void Main(string[] args) {
-            string[] lines = Resources.Input.Split("\r\n");
             int task1Value = 0;
             int task2Value = 0;
 
@@ -20,7 +17,7 @@ namespace Day1 {
                 new("nine", '9')
             ];
 
-            foreach (string line in lines) {
+            foreach (string line in File.ReadLines(args[0])) {
                 LineExtractor lineExtractor = new(digitWords, line);
                 task1Value += lineExtractor.CalculateNumber(checkDigitWords: false);
                 task2Value += lineExtractor.CalculateNumber(checkDigitWords: true);
