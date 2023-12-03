@@ -26,16 +26,16 @@
             bool currentNumberHasSymbol = false;
             foreach (Field field in Fields) {
                 if (field.IsPartOfNumber && !foundNumberFields.Contains(field)) {
-                    Field? analyzingField = field;
+                    Field analyzingField = field;
                     do {
-                        if (HasPartSymbolAdjacent(analyzingField.Value)) {
+                        if (HasPartSymbolAdjacent(analyzingField)) {
                             currentNumberHasSymbol = true;
                         }
-                        foundNumberFields.Add(analyzingField.Value);
-                        currentNumber.Fields.Add(analyzingField.Value);
+                        foundNumberFields.Add(analyzingField);
+                        currentNumber.Fields.Add(analyzingField);
 
-                        analyzingField = GetField(analyzingField.Value.Right);
-                    } while (analyzingField.HasValue && analyzingField.Value.IsPartOfNumber);
+                        analyzingField = GetField(analyzingField.Right);
+                    } while (analyzingField != null && analyzingField.IsPartOfNumber);
 
                     if (currentNumberHasSymbol) {
                         foundNumbers.Add(currentNumber);
@@ -54,9 +54,9 @@
             Fields.Where(field => field.IsGearSymbol).ToList().ForEach(gearField => gearsWithNumbers.Add(gearField, []));
 
             foreach(Number number in allNumbers) {
-                Field? gearSymbol = number.GetAdjacentGearSymbol();
-                if(gearSymbol.HasValue) {
-                    gearsWithNumbers[gearSymbol.Value].Add(number);
+                Field gearSymbol = number.GetAdjacentGearSymbol();
+                if(gearSymbol != null) {
+                    gearsWithNumbers[gearSymbol].Add(number);
                 }
             }
 
@@ -79,24 +79,21 @@
 
         private bool HasPartSymbolAdjacent(Field field) {
             return field.AdjacentCoordinates.Any(coord => {
-                Field? field = GetField(coord);
-                return field.HasValue && field.Value.IsPartSymbol;
+                Field field = GetField(coord);
+                return field != null && field.IsPartSymbol;
             });
         }
 
-        public Field? FindAdjacentGearSymbol(Field field) {
+        public Field FindAdjacentGearSymbol(Field field) {
             foreach((int, int) coord in field.AdjacentCoordinates) {
-                Field? adjacentField = GetField(coord);
-                if(adjacentField.HasValue && adjacentField.Value.IsGearSymbol) {
+                Field adjacentField = GetField(coord);
+                if(adjacentField != null && adjacentField.IsGearSymbol) {
                     return adjacentField;
                 }
             }
             return null;
         }
 
-        private Field? GetField((int line, int col) coordinate) {
-            IEnumerable<Field> found = Fields.Where(field => field.Coordinates == coordinate);
-            return found.Any() ? found.First() : null;
-        }
+        private Field GetField((int line, int col) coordinate) => Fields.FirstOrDefault(field => field.Coordinates == coordinate);
     }
 }
