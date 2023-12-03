@@ -4,8 +4,13 @@
         private Schematic schematic = schematic;
 
         public Field? GetAdjacentGearSymbol() {
-            Field[] gearSymbols = Fields.Where(schematic.HasGearSymbolAdjacent).ToArray();
-            return gearSymbols.Length != 0 ? gearSymbols.First() : null;
+            foreach(Field field in Fields) {
+                Field? gearField = schematic.FindAdjacentGearSymbol(field);
+                if(gearField.HasValue) {
+                    return gearField;
+                }
+            }
+            return null;
         }
 
         public int GetNumber() {

@@ -48,10 +48,30 @@
             return foundNumbers;
         }
 
-        public List<int> GetAllGearRatios(List<Number> numbers) {
+        public List<int> GetAllGearRatios(List<Number> allNumbers) {
             List<int> ratios = [];
-            foreach(Field gearField in Fields.Where(field => field.IsGearSymbol)) {
+            Dictionary<Field, List<Number>> gearsWithNumbers = [];
+            Fields.Where(field => field.IsGearSymbol).ToList().ForEach(gearField => gearsWithNumbers.Add(gearField, []));
 
+            foreach(Number number in allNumbers) {
+                Field? gearSymbol = number.GetAdjacentGearSymbol();
+                if(gearSymbol.HasValue) {
+                    gearsWithNumbers[gearSymbol.Value].Add(number);
+                }
+            }
+
+            foreach (List<Number> numbersOfGear in gearsWithNumbers.Values) {
+                if(numbersOfGear.Count >= 2) {
+                    int gearRatio = 0;
+                    numbersOfGear.ForEach(number => {
+                        if (gearRatio == 0) {
+                            gearRatio = number.GetNumber();
+                        } else {
+                            gearRatio *= number.GetNumber();
+                        }
+                    });
+                    ratios.Add(gearRatio);
+                }
             }
 
             return ratios;
@@ -64,20 +84,19 @@
             });
         }
 
-        public bool HasGearSymbolAdjacent(Field field) {
-            return field.AdjacentCoordinates.Any(coord => {
-                Field? field = GetField(coord);
-                return field.HasValue && field.Value.IsGearSymbol;
-            });
+        public Field? FindAdjacentGearSymbol(Field field) {
+            foreach((int, int) coord in field.AdjacentCoordinates) {
+                Field? adjacentField = GetField(coord);
+                if(adjacentField.HasValue && adjacentField.Value.IsGearSymbol) {
+                    return adjacentField;
+                }
+            }
+            return null;
         }
 
         private Field? GetField((int line, int col) coordinate) {
             IEnumerable<Field> found = Fields.Where(field => field.Coordinates == coordinate);
-            if (found.Any()) {
-                return found.First();
-            } else {
-                return null;
-            }
+            return found.Any() ? found.First() : null;
         }
     }
 }
