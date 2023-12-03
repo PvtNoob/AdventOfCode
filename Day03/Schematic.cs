@@ -19,10 +19,10 @@
             }
         }
 
-        public List<int> GetAllNumbersWithSymbols() {
+        public List<Number> GetAllNumbersWithSymbols() {
             List<Field> foundNumberFields = [];
-            List<int> foundNumbers = [];
-            string currentNumber = string.Empty;
+            List<Number> foundNumbers = [];
+            Number currentNumber = new(this);
             bool currentNumberHasSymbol = false;
             foreach (Field field in Fields) {
                 if (field.IsPartOfNumber && !foundNumberFields.Contains(field)) {
@@ -32,26 +32,42 @@
                             currentNumberHasSymbol = true;
                         }
                         foundNumberFields.Add(analyzingField.Value);
-                        currentNumber += analyzingField.Value.Ch;
+                        currentNumber.Fields.Add(analyzingField.Value);
 
                         analyzingField = GetField(analyzingField.Value.Right);
                     } while (analyzingField.HasValue && analyzingField.Value.IsPartOfNumber);
 
                     if (currentNumberHasSymbol) {
-                        foundNumbers.Add(int.Parse(currentNumber));
+                        foundNumbers.Add(currentNumber);
                         currentNumberHasSymbol = false;
                     }
-                    currentNumber = string.Empty;
+                    currentNumber = new(this);
                 }
             }
 
             return foundNumbers;
         }
 
+        public List<int> GetAllGearRatios(List<Number> numbers) {
+            List<int> ratios = [];
+            foreach(Field gearField in Fields.Where(field => field.IsGearSymbol)) {
+
+            }
+
+            return ratios;
+        }
+
         private bool HasPartSymbolAdjacent(Field field) {
             return field.AdjacentCoordinates.Any(coord => {
                 Field? field = GetField(coord);
                 return field.HasValue && field.Value.IsPartSymbol;
+            });
+        }
+
+        public bool HasGearSymbolAdjacent(Field field) {
+            return field.AdjacentCoordinates.Any(coord => {
+                Field? field = GetField(coord);
+                return field.HasValue && field.Value.IsGearSymbol;
             });
         }
 

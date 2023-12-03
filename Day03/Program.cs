@@ -10,8 +10,10 @@ namespace Day03 {
 
             string[] lines = File.ReadAllLines(args[0]);
             Schematic schematic = new(lines);
-            List<int> numbers = schematic.GetAllNumbersWithSymbols();
-            p1_score = numbers.Sum(x => x);
+            List<Number> numbers = schematic.GetAllNumbersWithSymbols();
+            p1_score = numbers.Sum(x => x.GetNumber());
+
+            p2_score = schematic.GetAllGearRatios(numbers).Sum();
 
             Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
         }

@@ -3,9 +3,11 @@
 namespace Day03 {
     internal struct Field {
         private static List<char> possiblePartSymbols = ['#', '/', '*', '-', '+', '&', '$', '=', '@', '%'];
+        private static char gearSymbol = '*';
 
         public char Ch;
         public bool IsPartSymbol;
+        public bool IsGearSymbol;
         public bool IsPartOfNumber;
         public int? Number;
         public (int line, int col) Coordinates;
@@ -24,6 +26,7 @@ namespace Day03 {
             Ch = ch;
             Coordinates = coordinates;
             IsPartSymbol = possiblePartSymbols.Contains(ch);
+            IsGearSymbol = ch == gearSymbol;
             IsPartOfNumber = ch.IsNumeric(out int output);
             Number = output;
 
