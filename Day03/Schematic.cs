@@ -11,7 +11,10 @@
 
             for (int lineNo = 0; lineNo < NumberOfLines; lineNo++) {
                 for (int colNo = 0; colNo < NumberOfColumns; colNo++) {
-                    Fields.Add(new Field(lines[lineNo][colNo], new(lineNo, colNo)));
+                    char ch = lines[lineNo][colNo];
+                    if(ch != '.') {
+                        Fields.Add(new Field(ch, new(lineNo, colNo)));
+                    }
                 }
             }
         }
