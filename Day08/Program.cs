@@ -19,40 +19,30 @@ namespace Day08 {
                 coordinates.Add(parts[0], coord);
             }
 
-            //Part1
-            string p1CurrentLocation = "AAA";
-            for (int i = 0; i < directions.Length; i = i == directions.Length - 1 ? 0 : i + 1) {
-                p1_score++;
-                p1CurrentLocation = coordinates[p1CurrentLocation][directions[i]];
-                if (p1CurrentLocation == "ZZZ") {
+            string[] currentLocations = coordinates.Keys.Where(x => x.EndsWith('A')).ToArray();
+            long[] p2AmountOfSteps = new long[currentLocations.Length];
+            Array.Fill(p2AmountOfSteps, 0);
+
+            long totalStepCounter = 1;
+            for (int directionsIndex = 0; directionsIndex < directions.Length; directionsIndex = directionsIndex == directions.Length - 1 ? 0 : directionsIndex + 1) {
+                for (int i = 0; i < currentLocations.Length; i++) {
+                    currentLocations[i] = coordinates[currentLocations[i]][directions[directionsIndex]];
+                    if (currentLocations[i].EndsWith('Z') && p2AmountOfSteps[i] == 0) {
+                        if (currentLocations[i] == "ZZZ") {
+                            p1_score = totalStepCounter;
+                        }
+                        p2AmountOfSteps[i] = totalStepCounter;
+                    }
+                }
+
+                totalStepCounter++;
+
+                if (p2AmountOfSteps.All(x => x > 0)) {
                     break;
                 }
             }
 
-            //Part2
-            string[] p2CurrentLocations = coordinates.Keys.Where(x => x.EndsWith('A')).ToArray();
-            long[] loopLengths = new long[p2CurrentLocations.Length];
-            Array.Fill(loopLengths, 0);
-
-            int currentDirectionIndex = 0;
-            int directionLoop = 0;
-            do {
-                for (int j = 0; j < p2CurrentLocations.Length; j++) {
-                    p2CurrentLocations[j] = coordinates[p2CurrentLocations[j]][directions[currentDirectionIndex]];
-                    if (p2CurrentLocations[j].EndsWith('Z') && loopLengths[j] == 0) {
-                        loopLengths[j] = directionLoop + 1;
-                    }
-                }
-
-                if(currentDirectionIndex == directions.Length - 1) {
-                    currentDirectionIndex = 0;
-                    directionLoop++;
-                } else {
-                    currentDirectionIndex++;
-                }
-            } while (loopLengths.Any(x => x == 0));
-
-            p2_score = FindLowestCommonMultiplier(loopLengths) * directions.Length;
+            p2_score = FindLowestCommonMultiplier(p2AmountOfSteps);
 
             Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
         }
