@@ -9,10 +9,10 @@ namespace Day09 {
             long p2_score = 0;
 
             foreach(string line in File.ReadLines(args[0])) {
-                List<List<int>> numbers = [line.Split(' ').Select(int.Parse).ToList()];
+                List<List<long>> numbers = [line.Split(' ').Select(long.Parse).ToList()];
 
                 do {
-                    List<int> newNumbers = [];
+                    List<long> newNumbers = [];
                     for (int i = 0; i < numbers.Last().Count - 1; i++) {
                         newNumbers.Add(numbers.Last()[i + 1] - numbers.Last()[i]);
                     }
