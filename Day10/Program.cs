@@ -51,17 +51,16 @@ namespace Day10 {
 
             //Part2
             ExpandMap();
-            expandMap[0][0] = 'O';
-            for(int repeat = 0; repeat < 150;  repeat++) {
-                for (int row = 0; row <= expandedRowMaxIndex; row++) {
-                    for (int col = 0; col <= expandedColumnMaxIndex; col++) {
-                        Flood((row, col));
-                    }
-                }
-            }
+            Thread thread = new(new ThreadStart(FloodStart), int.MaxValue);
+            thread.Start();
+            while (thread.IsAlive) { }
             p2_score = CountInnerFields();
 
             Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
+        }
+
+        private static void FloodStart() {
+            Flood((0, 0));
         }
 
         private static (int, int) FindStartCoordinate() {
@@ -212,22 +211,30 @@ namespace Day10 {
 
         private static void Flood((int row, int col) position) {
             char ch = GetExpanded(position);
-            if (IsPipe(ch)) return;
-            if(!IsAtNorthEnd(position) && GetExpanded(GoNorth(position)) == 'O'){
-                expandMap[position.row][position.col] = 'O';
+            if (ch == 'O' || IsPipe(ch)) {
                 return;
+            } else {
+                expandMap[position.row][position.col] = 'O';
             }
-            if (!IsAtEastEnd(position, true) && GetExpanded(GoEast(position)) == 'O') {
-                expandMap[position.row][position.col] = 'O';
-                return;
+
+            if (!IsAtNorthEnd(position)) {
+                (int, int) north = GoNorth(position);
+                Flood(north);
             }
-            if (!IsAtSouthEnd(position, true) && GetExpanded(GoSouth(position)) == 'O') {
-                expandMap[position.row][position.col] = 'O';
-                return;
+
+            if (!IsAtEastEnd(position, expanded: true)) {
+                (int, int) east = GoEast(position);
+                Flood(east);
             }
-            if (!IsAtWestEnd(position) && GetExpanded(GoWest(position)) == 'O') {
-                expandMap[position.row][position.col] = 'O';
-                return;
+
+            if (!IsAtSouthEnd(position, expanded: true)) {
+                (int, int) south = GoSouth(position);
+                Flood(south);
+            }
+
+            if (!IsAtWestEnd(position)) {
+                (int, int) west = GoWest(position);
+                Flood(west);
             }
         }
 
