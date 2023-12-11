@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Day11": {
+      "commandName": "Project",
+      "commandLineArgs": "E:\\Repos\\AdventOfCode2023\\AdventOfCode2023\\Day11\\BigInput.txt"
+    }
+  }
+}
