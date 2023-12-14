@@ -35,7 +35,7 @@ namespace Day12 {
                 p2_score += possibilities;
             }
 
-            Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
+            Console.WriteLine($"Part1 Result: {p1_score} ({p1_score == 21})\nPart2 Result: {p2_score} ({p2_score == 525152})");
             Console.WriteLine($"Elapsed: {stopwatch.Elapsed}");
         }
 
@@ -48,10 +48,20 @@ namespace Day12 {
 
             long possibilities = 0;
             int indexToSearch = lengthIndexes.Length;
-            //Very first index is zero. Then start after the length before with one space between
-            int startIndex = lengthIndexes.Length > 0 ? lengthIndexes.Last() + lenghts[indexToSearch - 1] + 1 : 0;
+
+            int startIndex;
+            if(indexToSearch == 0) {
+                //Very first index. Use first possible place, that has enough space
+                startIndex = _possiblePlaceIndexes.First();
+            } else {
+                startIndex = lengthIndexes.Last() + lenghts[indexToSearch - 1] + 1;
+            }
 
             for(int i = startIndex; i <= field.Length - lenghts[indexToSearch]; i++) {
+                if (!_possiblePlaceIndexes.Contains(i)) {
+                    continue;
+                }
+
                 //Build lengthIndexes
                 int[] nextLengthIndexes = new int[indexToSearch + 1];
                 lengthIndexes.CopyTo(nextLengthIndexes, 0);
