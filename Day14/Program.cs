@@ -8,33 +8,28 @@ namespace Day14 {
         private static (int, int) _west = (0, -1);
         private static (int, int) _south = (1, 0);
         private static (int, int) _east = (0, 1);
+        private static List<int> _loads = [];
+
+        private static readonly int CYCLE_AMOUNT = 200;
+        private static readonly int START_INDEX = 100;
 
         static void Main(string[] args) {
             if (!ArgsValidator.IsValidArgs(args)) return;
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            long p1_score = 0;
-            long p2_score = 0;
-
             _fields = File.ReadAllLines(args[0]).Select(line => line.Select(GetField).ToArray()).ToArray();
 
-            //Nach 2 cycles wiederholt sich das ergebniss alle 7 cycles
-            int[] cycle = [69, 69, 65, 64, 65, 63, 68];
-            int cycleStartIndex = 2;
-            int remainder = 1000000000 % cycle.Length;
-            int result = cycle[remainder - cycleStartIndex - 1];
-
             TiltNorth();
-            p1_score = CalculateLoad();
+            long p1_score = CalculateLoad();
 
-            for (int i = 0; i < 1000000000; i++) {
+            for (int i = 0; i < CYCLE_AMOUNT; i++) {
                 TiltNorth();
                 TiltWest();
                 TiltSouth();
                 TiltEast();
+                _loads.Add(CalculateLoad());
             }
-
-            p2_score = CalculateLoad();
+            long p2_score = CalculateLoadViaCycles();
 
             Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
             Console.WriteLine($"Elapsed: {stopwatch.Elapsed}");
@@ -126,10 +121,65 @@ namespace Day14 {
             return load;
         }
 
-        private enum Field : byte {
-            Nothing,
-            CubeRock,
-            RoundRock
+        private static int CalculateLoadViaCycles() {
+            //The first loads are never part of the cycle, skip the fist 100
+            int startIndex = START_INDEX;
+
+            //Take three loads
+            int[] startCycle = [_loads[startIndex], _loads[startIndex + 1], _loads[startIndex + 2]];
+
+            //Search the index, at that the three numbers can be found again
+            int nextCycleIndex = 0;
+            for(nextCycleIndex = startIndex + 3; nextCycleIndex < _loads.Count - 3; nextCycleIndex++) {
+                if (_loads[nextCycleIndex] == startCycle[0] && _loads[nextCycleIndex + 1] == startCycle[1] && _loads[nextCycleIndex + 2] == startCycle[2]) {
+                    break;
+                }
+            }
+
+            //Make a list with the whole cycle
+            List<int> wholeCycle = [];
+            for (int i = startIndex; i < nextCycleIndex; i++) {
+                wholeCycle.Add(_loads[i]);
+            }
+
+            //Search the beginning of the cycle
+            List<int> cycleStartIndexList = [];
+            //Shift the cycle numbers so every number is first at some time
+            for (int shiftAmount = 0; shiftAmount < wholeCycle.Count; shiftAmount++) {
+                //Go through the loads and look, if the cycle is starting there
+                for (int loadIndex = 0; loadIndex < _loads.Count; loadIndex++) {
+                    int cycleStartIndex = -1;
+                    for (int cycleIndex = 0; cycleIndex <= 3; cycleIndex++) {
+                        if (cycleIndex == 3) {
+                            cycleStartIndex = loadIndex;
+                            break;
+                        }
+                        if (_loads[loadIndex + cycleIndex] != wholeCycle[cycleIndex]) {
+                            break;
+                        }
+                    }
+                    if (cycleStartIndex > -1) {
+                        cycleStartIndexList.Add(cycleStartIndex);
+                        break;
+                    }
+                }
+
+                //Shift the cycle
+                int temp = wholeCycle[0];
+                wholeCycle.RemoveAt(0);
+                wholeCycle.Add(temp);
+            }
+            int firstCycleIndex = cycleStartIndexList.Min();
+
+            //Build correct cycle
+            List<int> correctCycle = [];
+            for (int i = firstCycleIndex; i < firstCycleIndex + wholeCycle.Count; i++) {
+                correctCycle.Add(_loads[i]);
+            }
+
+            int remainder = (1000000000 - firstCycleIndex) % correctCycle.Count;
+            int result = correctCycle[remainder - 1];
+            return result;
         }
 
         private static void PrintFields() {
@@ -144,5 +194,11 @@ namespace Day14 {
             Field.RoundRock => 'O',
             _ => '.'
         };
+
+        private enum Field : byte {
+            Nothing,
+            CubeRock,
+            RoundRock
+        }
     }
 }
