@@ -42,10 +42,10 @@ namespace Day12 {
             Console.WriteLine($"Elapsed: {stopwatch.Elapsed}");
         }
 
-        private static long TryCombinations(string field, int[] lenghts, int[] indexList, int indexToSearch) {
-            if (_amountOfIndexesToPlace == indexList.Length) {
-                return CheckHashTags(field, lenghts, indexList, partial: false) ? 1 : 0;
-            } else if (!CheckHashTags(field, lenghts, indexList, partial: true)) {
+        private static long TryCombinations(string field, int[] lenghts, List<int> indexList, int indexToSearch) {
+            if (_amountOfIndexesToPlace == indexList.Count) {
+                return CheckHashTags(indexList, partial: false) ? 1 : 0;
+            } else if (indexList.Count > 0 && !CheckHashTags(indexList, partial: true)) {
                 return 0;
             }
 
@@ -53,7 +53,6 @@ namespace Day12 {
             int startIndex = indexToSearch == 0 ? _possiblePlaceIndexes.First() : indexList.Last() + 2;
 
             for (int index = startIndex; index <= field.Length - lenghts[indexToSearch]; index++) {
-
                 bool impossible = false;
                 for (int checkIndex = index; checkIndex < index + lenghts[indexToSearch]; checkIndex++) {
                     if (!_possiblePlaceIndexes.Contains(checkIndex)) {
@@ -66,10 +65,9 @@ namespace Day12 {
                 }
 
                 //Build lengthIndexes
-                int[] nextLengthIndexes = new int[indexList.Length + lenghts[indexToSearch]];
-                indexList.CopyTo(nextLengthIndexes, 0);
+                List<int> nextLengthIndexes = [.. indexList];
                 for (int length = 0; length < lenghts[indexToSearch]; length++) {
-                    nextLengthIndexes[indexList.Length + length] = index + length;
+                    nextLengthIndexes.Add(index + length);
                 }
 
                 possibilities += TryCombinations(field, lenghts, nextLengthIndexes, indexToSearch + 1);
@@ -78,22 +76,13 @@ namespace Day12 {
             return possibilities;
         }
 
-        private static bool CheckHashTags(string field, int[] lenghts, int[] indexList, bool partial) {
-            if (indexList.Length == 0) return true;
-
-            if (partial) {
-                //Check if a # is in an empty space
-                foreach (int hashTagIndex in _hashTagIndexes) {
-                    if (hashTagIndex < indexList.Last() && !indexList.Contains(hashTagIndex)) {
-                        return false;
-                    }
+        private static bool CheckHashTags(List<int> indexList, bool partial) {
+            foreach (int hashTagIndex in _hashTagIndexes) {
+                if (partial && hashTagIndex > indexList.Last()) {
+                    continue;
                 }
-            } else {
-                //Check if all # are placed
-                foreach (int index in _hashTagIndexes) {
-                    if (!indexList.Contains(index)) {
-                        return false;
-                    }
+                if (!indexList.Contains(hashTagIndex)) {
+                    return false;
                 }
             }
 
