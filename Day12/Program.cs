@@ -3,19 +3,26 @@ using Shared;
 
 namespace Day12 {
     internal class Program {
+        private static List<int> _hashTagIndexes = [];
+        private static List<int> _possiblePlaceIndexes = [];
+
         static void Main(string[] args) {
             if (!ArgsValidator.IsValidArgs(args)) return;
             Stopwatch stopwatch = Stopwatch.StartNew();
+            Stopwatch fieldWatch = new();
 
             long p1_score = 0;
             long p2_score = 0;
 
             foreach(string line in File.ReadLines(args[0])) {
                 string field = line.Split(' ')[0];
+                BuildFieldCaches(field);
                 int[] lenghts = line.Split(' ')[1].Split(',').Select(int.Parse).ToArray();
                 p1_score += TryCombinations(field, lenghts, []);
 
+                fieldWatch.Start();
                 string unfoldField = $"{field}?{field}?{field}?{field}?{field}";
+                BuildFieldCaches(unfoldField);
                 int[] unfoldLengths = new int[lenghts.Length * 5];
                 lenghts.CopyTo(unfoldLengths, 0);
                 lenghts.CopyTo(unfoldLengths, lenghts.Length);
@@ -23,7 +30,8 @@ namespace Day12 {
                 lenghts.CopyTo(unfoldLengths, lenghts.Length * 3);
                 lenghts.CopyTo(unfoldLengths, lenghts.Length * 4);
                 long possibilities = TryCombinations(unfoldField, unfoldLengths, []);
-                Console.WriteLine($"Unfold field {field} has {possibilities} possible solutions");
+                Console.WriteLine($"Found after {fieldWatch.Elapsed} {possibilities} \tpossible solutions in field {field}.");
+                fieldWatch.Reset();
                 p2_score += possibilities;
             }
 
@@ -44,9 +52,11 @@ namespace Day12 {
             int startIndex = lengthIndexes.Length > 0 ? lengthIndexes.Last() + lenghts[indexToSearch - 1] + 1 : 0;
 
             for(int i = startIndex; i <= field.Length - lenghts[indexToSearch]; i++) {
+                //Build lengthIndexes
                 int[] nextLengthIndexes = new int[indexToSearch + 1];
                 lengthIndexes.CopyTo(nextLengthIndexes, 0);
                 nextLengthIndexes[indexToSearch] = i;
+
                 possibilities += TryCombinations(field, lenghts, nextLengthIndexes);
             }
 
@@ -64,28 +74,22 @@ namespace Day12 {
 
             //Check if all lengths are possible
             foreach(int index in indexList) {
-                if (field[index] is not ('#' or '?')) {
+                if (!_possiblePlaceIndexes.Contains(index)) {
                     return false;
                 }
             }
 
             if(partial) {
                 //Check if a # is in an empty space
-                List<int> hashTagIndexList = [];
-                for(int i = 0; i < lenghts.Length; i++) {
-                    if (field[i] == '#') {
-                        hashTagIndexList.Add(i);
-                    }
-                }
-                foreach(int hashTagIndex in hashTagIndexList) {
+                foreach(int hashTagIndex in _hashTagIndexes) {
                     if(hashTagIndex < lengthIndexes.Last() && !indexList.Contains(hashTagIndex)) {
                         return false;
                     }
                 }
             } else {
                 //Check if all # are placed
-                for (int i = 0; i < field.Length; i++) {
-                    if (field[i] is '#' && !indexList.Contains(i)) {
+                foreach(int index in _hashTagIndexes) {
+                    if(!indexList.Contains(index)) {
                         return false;
                     }
                 }
@@ -94,6 +98,18 @@ namespace Day12 {
             return true;
         }
 
-        private static string GetString(int[] indexes) => string.Join(", ", indexes);
+        private static void BuildFieldCaches(string field) {
+            _hashTagIndexes.Clear();
+            _possiblePlaceIndexes.Clear();
+            
+            for(int i = 0; i < field.Length; i++) {
+                if (field[i] == '#') {
+                    _hashTagIndexes.Add(i);
+                    _possiblePlaceIndexes.Add(i);
+                } else if (field[i] == '?') {
+                    _possiblePlaceIndexes.Add(i);
+                }
+            }
+        }
     }
 }
