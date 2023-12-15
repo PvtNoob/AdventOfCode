@@ -10,7 +10,6 @@ namespace Day12 {
         static void Main(string[] args) {
             if (!ArgsValidator.IsValidArgs(args)) return;
             Stopwatch stopwatch = Stopwatch.StartNew();
-            Stopwatch fieldWatch = new();
 
             long p1_score = 0;
             long p2_score = 0;
@@ -24,8 +23,6 @@ namespace Day12 {
                 combinationCache.Clear();
 
                 //Part2
-                fieldWatch.Start();
-
                 string unfoldField = $"{field}?{field}?{field}?{field}?{field}";
                 BuildFieldCaches(unfoldField);
 
@@ -38,14 +35,10 @@ namespace Day12 {
 
                 long possibilities = TryCombinations(unfoldField, unfoldLengths, [], 0, _possiblePlaceIndexes.First());
                 combinationCache.Clear();
-
-                Console.WriteLine($"Found after {fieldWatch.Elapsed} {possibilities} \tpossible solutions in field {field}");
                 p2_score += possibilities;
-
-                fieldWatch.Reset();
             }
 
-            Console.WriteLine($"Part1 Result: {p1_score} ({p1_score == 21})\nPart2 Result: {p2_score} ({p2_score == 525152})");
+            Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
             Console.WriteLine($"Elapsed: {stopwatch.Elapsed}");
         }
 
@@ -62,7 +55,6 @@ namespace Day12 {
 
             //Check is partial combination is valid
             if (indexList.Count > 0 && !CheckCombination(indexList, partial: true)) {
-                combinationCache.Add((indexToSearch, startFieldIndex), 0);
                 return 0;
             }
 
