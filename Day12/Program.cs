@@ -1,18 +1,19 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using Shared;
 
 namespace Day12 {
     internal class Program {
         private static List<int> _hashTagIndexes = [];
         private static List<int> _possiblePlaceIndexes = [];
-        private static Dictionary<(int lengthIndex, int startIndex), long> combinationCache = [];
+        private static Dictionary<(int lengthIndex, int startIndex), BigInteger> combinationCache = [];
 
         static void Main(string[] args) {
             if (!ArgsValidator.IsValidArgs(args)) return;
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            long p1_score = 0;
-            long p2_score = 0;
+            BigInteger p1_score = 0;
+            BigInteger p2_score = 0;
 
             foreach (string line in File.ReadLines(args[0])) {
                 //Part1
@@ -33,23 +34,22 @@ namespace Day12 {
                 lenghts.CopyTo(unfoldLengths, lenghts.Length * 3);
                 lenghts.CopyTo(unfoldLengths, lenghts.Length * 4);
 
-                long possibilities = TryCombinations(unfoldField, unfoldLengths, [], 0, _possiblePlaceIndexes.First());
+                p2_score += TryCombinations(unfoldField, unfoldLengths, [], 0, _possiblePlaceIndexes.First());
                 combinationCache.Clear();
-                p2_score += possibilities;
             }
 
             Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
             Console.WriteLine($"Elapsed: {stopwatch.Elapsed}");
         }
 
-        private static long TryCombinations(string field, int[] lengths, List<int> indexList, int indexToSearch, int startFieldIndex) {
+        private static BigInteger TryCombinations(string field, int[] lengths, List<int> indexList, int indexToSearch, int startFieldIndex) {
             //If indexToSearch is out of bounds, the max depths is reached
             if (indexToSearch >= lengths.Length) {
                 return CheckCombination(indexList, partial: false) ? 1 : 0;
             }
 
             //Check, if this combination was searched for before
-            if (combinationCache.TryGetValue((indexToSearch, startFieldIndex), out long combinations)) {
+            if (combinationCache.TryGetValue((indexToSearch, startFieldIndex), out BigInteger combinations)) {
                 return combinations;
             }
 
@@ -58,7 +58,7 @@ namespace Day12 {
                 return 0;
             }
 
-            long possibilities = 0;
+            BigInteger possibilities = 0;
             for (int index = startFieldIndex; index <= field.Length - lengths[indexToSearch]; index++) {
                 List<int> nextIndexList = [.. indexList];
                 for (int length = 0; length < lengths[indexToSearch]; length++) {
