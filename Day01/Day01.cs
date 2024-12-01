@@ -1,9 +1,13 @@
-﻿using Shared;
+﻿using System.Diagnostics;
+using Shared;
 
 namespace Day01 {
     internal class Day01 {
         static void Main(string[] args) {
             if(!ArgsValidator.IsValidArgs(args)) return;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             int p1_score = 0;
             int p2_score = 0;
@@ -20,18 +24,13 @@ namespace Day01 {
             leftList.Sort();
             rightList.Sort();
 
-            //Part1
             for(int i = 0; i < leftList.Count; i++) {
                 p1_score += Math.Abs(leftList[i] - rightList[i]);
+                p2_score += leftList[i] * rightList.Where(x => x == leftList[i]).Count();
             }
 
-            //Part2
-            for(int i = 0; i < leftList.Count; i++) {
-                int occourences = rightList.Count(x => x == leftList[i]);
-                p2_score += leftList[i] * occourences;
-            }
-
-            Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}");
+            stopwatch.Stop();
+            Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}\nFinished in {stopwatch.Elapsed}");
         }
     }
 }
