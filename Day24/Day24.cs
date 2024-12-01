@@ -1,7 +1,7 @@
 ﻿using Shared;
 
-namespace Day14 {
-    internal class Program {
+namespace Day24 {
+    internal class Day24 {
         static void Main(string[] args) {
             if(!ArgsValidator.IsValidArgs(args)) return;
 

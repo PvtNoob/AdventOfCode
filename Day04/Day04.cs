@@ -1,10 +1,6 @@
-﻿using Shared;
-
-namespace Day14 {
-    internal class Program {
+﻿namespace Day04 {
+    internal class Day04 {
         static void Main(string[] args) {
-            if(!ArgsValidator.IsValidArgs(args)) return;
-
             int p1_score = 0;
             int p2_score = 0;
 
