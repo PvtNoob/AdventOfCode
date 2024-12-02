@@ -13,28 +13,69 @@ namespace Day02 {
             int p2_score = 0;
 
             foreach(string line in File.ReadLines(args[0])) {
-                int[] numbers = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+                List<int> numbers = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
 
-                bool isSafeLine = true;
-                bool ascending = numbers[0] < numbers[1];
-                int lastNumber = numbers[0];
+                //Determine IsAscending
+                bool isAscending = true;
+                short ascendingErrors = 0;
+                short descendingErrors = 0;
 
-                for(int i = 1; i < numbers.Length; i++) {
+                for(int i = 1; i < numbers.Count; i++) {
                     int difference = numbers[i] - numbers[i - 1];
-                    if(ascending) {
-                        isSafeLine &= difference >= 1 && difference <= 3;
-                    } else {
-                        isSafeLine &= difference <= -1 && difference >= -3;
+
+                    if(difference < 0) {
+                        ascendingErrors++;
+                    }
+
+                    if(difference > 0) {
+                        descendingErrors++;
                     }
                 }
 
-                if(isSafeLine) {
+                isAscending = ascendingErrors < descendingErrors;
+
+                //Check Lines
+                if(CheckLine(numbers, isAscending, out int? errorIndex)) {
                     p1_score++;
+                    p2_score++;
+                } else {
+                    List<int> numbersWithoutRight = numbers.Select(x => x).ToList();
+                    numbersWithoutRight.RemoveAt(errorIndex.Value);
+                    List<int> numbersWithoutLeft = numbers.Select(x => x).ToList();
+                    numbersWithoutLeft.RemoveAt(errorIndex.Value - 1);
+
+                    if(CheckLine(numbersWithoutLeft, isAscending, out _) || CheckLine(numbersWithoutRight, isAscending, out _)) {
+                        p2_score++;
+                    }
                 }
             }
 
             stopwatch.Stop();
             Console.WriteLine($"Part1 Result: {p1_score}\nPart2 Result: {p2_score}\nFinished in {stopwatch.Elapsed}");
+        }
+
+        private static bool IsSafeAscend(int difference) {
+            return difference >= 1 && difference <= 3;
+        }
+
+        private static bool IsSafeDescend(int difference) {
+            return difference <= -1 && difference >= -3;
+        }
+
+        private static bool CheckLine(List<int> numbers, bool isAscending, out int? errorIndex) {
+            errorIndex = null;
+
+            for(int i = 1; i < numbers.Count; i++) {
+                int difference = numbers[i] - numbers[i - 1];
+                bool isSafe = isAscending ? IsSafeAscend(difference) : IsSafeDescend(difference);
+
+                if(!isSafe) {
+                    errorIndex = i;
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
