@@ -25,9 +25,7 @@ namespace Day02 {
 
                     if(difference < 0) {
                         ascendingErrors++;
-                    }
-
-                    if(difference > 0) {
+                    } else if(difference > 0) {
                         descendingErrors++;
                     }
                 }
