@@ -2,7 +2,7 @@
   "profiles": {
     "Day04": {
       "commandName": "Project",
-      "commandLineArgs": "E:\\Repos\\AdventOfCode2023\\AdventOfCode2023\\Day04\\BigInput.txt"
+      "commandLineArgs": "C:\\Users\\rober\\source\\repos\\PvtNoob\\AdventOfCode\\Day04\\Input.txt"
     }
   }
 }

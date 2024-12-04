@@ -1,6 +1,6 @@
 ﻿namespace Shared {
     public static class TupleExtensions {
-        private static (int rowMod, int colMod)[] _directions = [(-1, 0), (0, 1), (1, 0), (0, -1)];
+        private static (int rowMod, int colMod)[] _directions = [(-1, 0), (0, 1), (1, 0), (0, -1), (-1, 1), (-1, -1), (1, 1), (1, -1)];
 
         public static (int, int) Add(this (int, int) a, (int, int) b) => (a.Item1 + b.Item1, a.Item2 + b.Item2);
         public static (int, int) Move(this (int, int) position, Direction direction) => position.Add(_directions[(int)direction]);
